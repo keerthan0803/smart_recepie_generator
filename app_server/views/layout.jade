@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title= title
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    // Credits bar injected from localStorage
+    script.
+      (function(){
+        try {
+          var id = localStorage.getItem('customerId');
+          var credits = localStorage.getItem('customerCredits');
+          if (id && credits !== null) {
+            var bar = document.createElement('div');
+            bar.style.cssText = 'position:fixed;top:0;right:0;background:#111;color:#fbbf24;padding:6px 10px;border-bottom-left-radius:8px;font-weight:600;z-index:9999';
+            bar.textContent = '💰 ' + credits + ' credits';
+            document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(bar); });
+          }
+        } catch(e){}
+      })();
+    
+    block content

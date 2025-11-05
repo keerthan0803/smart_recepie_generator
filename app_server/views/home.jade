@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  link(rel='stylesheet', href='/stylesheets/home.css')
+  .home-container
+    .hero-section
+      h1= title
+      p Welcome to #{title}
+      p Discover amazing recipes tailored to your taste and ingredients!
+      
+    .action-section
+      .signup-prompt
+        h2 Ready to start cooking?
+        p Join our community of passionate home chefs and unlock personalized recipe recommendations.
+        .buttons-container
+          a(href="/signup", class="signup-link-btn") 🍳 Sign Up Now
+          a(href="/signin", class="signin-link-btn") 🍳 Sign In Now
+        
+      .features
+        .feature-item
+          h3 🎯 Personalized Recipes
+          p Get recipes based on your skill level and preferences
+        .feature-item
+          h3 🥘 Smart Ingredients
+          p Find recipes using ingredients you already have
+        .feature-item
+          h3 👩‍🍳 Learn & Grow
+          p Improve your cooking skills with step-by-step guidance

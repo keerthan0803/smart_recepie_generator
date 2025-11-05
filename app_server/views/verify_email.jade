@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  link(rel='stylesheet', href='/stylesheets/home.css')
+  .container
+    if success
+      h1 Email Verified ✅
+      p #{message}
+      p
+        a(href='/signin') Go to Sign In
+    else
+      h1 Email Verification Failed ❌
+      p #{message}
+      p
+        a(href='/signin') Back to Sign In

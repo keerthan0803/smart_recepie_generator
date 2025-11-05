@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  // Buy Credits page styles
+  link(rel='stylesheet', href='/stylesheets/buy_credits.css')
+  .container
+    .header
+      .logo-icon 🍳
+      .brand-text Smart Recipe Generator
+      .spacer
+      a(href='/') Home
+    h1 Buy Credits
+    p Each chat message uses 1 credit. New users start with 10 credits.
+    .pricing
+      .plan
+        h2 Small Pack
+        p 20 Credits
+        p ₹30
+        button#buy20(type='button') Buy 20
+      .plan
+        h2 Medium Pack
+        p 60 Credits
+        p ₹90
+        button#buy60(type='button') Buy 60
+      .plan
+        h2 Large Pack
+        p 150 Credits
+        p ₹120
+        button#buy150(type='button') Buy 150
+  script(src='/javascripts/buy_credits.js')

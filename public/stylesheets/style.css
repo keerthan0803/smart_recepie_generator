@@ -1,0 +1,49 @@
+/* Global base styles and responsive defaults */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 50px;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #0f172a;
+  background-color: #f8fafc;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Responsive body padding */
+@media (max-width: 1024px) {
+  body { padding: 30px; }
+}
+
+@media (max-width: 768px) {
+  body { padding: 20px 12px; }
+}
+
+@media (max-width: 480px) {
+  body { padding: 12px 8px; }
+}
