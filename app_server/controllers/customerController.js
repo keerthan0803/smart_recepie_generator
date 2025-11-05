@@ -11,6 +11,40 @@ const createCustomer = async (req, res) => {
     try {
         const { firstName, lastName, email, password, skillLevel } = req.body;
 
+        // Input validation
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
+        }
+
+        // Name validation (no special characters, only letters and spaces)
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Names can only contain letters and spaces'
+            });
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid email format'
+            });
+        }
+
+        // Password strength validation
+        if (password.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 8 characters long'
+            });
+        }
+
         // Check if customer already exists
         const existingCustomer = await Customer.findByEmail(email);
         if (existingCustomer) {
@@ -26,9 +60,9 @@ const createCustomer = async (req, res) => {
 
         // Create new customer
         const newCustomer = new Customer({
-            firstName,
-            lastName,
-            email,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            email: email.trim().toLowerCase(),
             password: hashedPassword,
             skillLevel: skillLevel || 'beginner'
         });
@@ -90,6 +124,23 @@ const createCustomer = async (req, res) => {
 const loginCustomer = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // Input validation
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email and password are required'
+            });
+        }
+
+        // Basic email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid email format'
+            });
+        }
 
         // Find customer by email
         const customer = await Customer.findByEmail(email);
