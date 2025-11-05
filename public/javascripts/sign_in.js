@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             try {
                 // Send login request to backend API
+                console.log('Attempting login with:', { email: loginData.email });
                 const response = await fetch('/api/customer/login', {
                     method: 'POST',
                     headers: {
@@ -121,7 +122,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify(loginData)
                 });
 
+                console.log('Response status:', response.status);
                 const result = await response.json();
+                console.log('Response data:', result);
 
                 if (response.ok && result.success) {
                     // Store customer info in localStorage
