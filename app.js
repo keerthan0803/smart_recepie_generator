@@ -9,6 +9,8 @@ var cors = require('cors');
 var rateLimit = require('express-rate-limit');
 var mongoSanitize = require('express-mongo-sanitize');
 var hpp = require('hpp');
+var session = require('express-session');
+var passport = require('./app_server/config/passport');
 require('dotenv').config();
 
 var indexRouter = require('./app_server/routes/index');
@@ -16,6 +18,7 @@ var usersRouter = require('./app_server/routes/users');
 var customerRouter = require('./app_server/routes/customer');
 var geminiRouter = require('./app_server/routes/gemini');
 var billingRouter = require('./app_server/routes/billing');
+var phonePeRouter = require('./app_server/routes/phonepe');
 
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI || process.env.MONGODB_LOCAL || 'mongodb://localhost:27017/smart-recipe-generator';
@@ -159,6 +162,22 @@ app.use(logger('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(cookieParser());
+
+// Session configuration for Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
@@ -166,6 +185,7 @@ app.use('/users', usersRouter);
 app.use('/api/customer', customerRouter);
 app.use('/api/gemini', geminiRouter);
 app.use('/api/billing', billingRouter);
+app.use('/api/phonepe', phonePeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

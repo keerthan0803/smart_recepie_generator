@@ -1,0 +1,102 @@
+extends layout
+
+block content
+  link(rel="stylesheet", href="/stylesheets/profile.css")
+  
+  .header
+    .logo-icon 🍳
+    .brand-text Smart Recipe Generator
+  
+  .complete-profile-container
+    .complete-profile-header
+      .icon 📋
+      h1 Complete Your Profile
+      p Help us personalize your cooking experience by completing your profile
+    
+    form#completeProfileForm
+      .section
+        h2 👤 Personal Details
+        .form-grid
+          .form-group
+            label(for="phoneNumber") Phone Number
+            input(type="tel", id="phoneNumber", name="phoneNumber", placeholder="+1 (555) 123-4567", required)
+            .helper-text We'll use this to send you important updates
+          
+          .form-group
+            label(for="age") Age
+            input(type="number", id="age", name="age", min="13", max="120", placeholder="Enter your age", required)
+            .helper-text Must be 13 or older
+          
+          .form-group.full-width
+            label(for="skillLevel") Cooking Skill Level
+            select(id="skillLevel", name="skillLevel", required)
+              option(value="") Select your skill level
+              option(value="beginner") Beginner - Just starting out
+              option(value="intermediate") Intermediate - Some experience
+              option(value="advanced") Advanced - Very experienced
+              option(value="professional") Professional Chef
+      
+      .section
+        h2 🥗 Dietary Preferences
+        p.section-subtitle Select all that apply
+        .checkbox-grid
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="vegetarian")
+            .checkbox-content
+              span.checkbox-icon 🥗
+              span.checkbox-text Vegetarian
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="vegan")
+            .checkbox-content
+              span.checkbox-icon 🌱
+              span.checkbox-text Vegan
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="gluten-free")
+            .checkbox-content
+              span.checkbox-icon 🌾
+              span.checkbox-text Gluten-Free
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="dairy-free")
+            .checkbox-content
+              span.checkbox-icon 🥛
+              span.checkbox-text Dairy-Free
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="keto")
+            .checkbox-content
+              span.checkbox-icon 🥑
+              span.checkbox-text Keto
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="paleo")
+            .checkbox-content
+              span.checkbox-icon 🍖
+              span.checkbox-text Paleo
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="halal")
+            .checkbox-content
+              span.checkbox-icon ☪️
+              span.checkbox-text Halal
+          
+          label.checkbox-label
+            input(type="checkbox", name="dietaryPreferences", value="kosher")
+            .checkbox-content
+              span.checkbox-icon ✡️
+              span.checkbox-text Kosher
+      
+      .section
+        h2 ⚠️ Allergies & Restrictions
+        .form-group
+          label(for="allergies") Do you have any food allergies?
+          textarea(id="allergies", name="allergies", rows="4", placeholder="e.g., peanuts, shellfish, eggs, soy")
+          .helper-text Enter your allergies separated by commas. This helps us provide safe recipe recommendations.
+      
+      .form-actions
+        button(type="button")#skipBtn.btn-secondary Skip for Now
+        button(type="submit").btn-primary Complete Profile
+  
+  script(src='/javascripts/complete_profile.js')

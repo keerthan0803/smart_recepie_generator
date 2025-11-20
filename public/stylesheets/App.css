@@ -80,12 +80,30 @@ body {
   gap: 1rem;
 }
 
-.credits-badge {
-  background: #1f2937;
-  color: #fbbf24;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  font-weight: 600;
+.user-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+.user-profile-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-greeting-link {
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .user-greeting {
@@ -94,10 +112,25 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.user-greeting-link:hover .user-greeting {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .user-icon {
   font-size: 1.5rem;
+}
+
+.credits-badge {
+  background: #1f2937;
+  color: #fbbf24;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-weight: 600;
 }
 
 .logout-btn {

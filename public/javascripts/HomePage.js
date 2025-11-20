@@ -2,6 +2,9 @@ import React from 'react';
 import '../stylesheets/HomePage.css';
 
 const HomePage = ({ customerName, customerId }) => {
+  // Fallback to localStorage if customerId not passed as prop
+  const userId = customerId || (typeof window !== 'undefined' ? localStorage.getItem('customerId') : null);
+  
   return (
     <div className="home-page">
       <section className="hero-section">
@@ -14,11 +17,15 @@ const HomePage = ({ customerName, customerId }) => {
             Your AI-powered cooking companion that creates personalized recipes based on your ingredients, preferences, and skill level
           </p>
           
-          {customerId ? (
+          {userId ? (
             <div className="cta-buttons">
               <a href="/chatbot" className="cta-button">
                 <span className="cta-icon">🤖</span>
                 Start Cooking with AI
+              </a>
+              <a href={`/profile?customerId=${userId}`} className="cta-button secondary">
+                <span className="cta-icon">👤</span>
+                My Profile
               </a>
               <a href="/buy-credits" className="cta-button secondary">
                 <span className="cta-icon">💰</span>
@@ -154,11 +161,15 @@ const HomePage = ({ customerName, customerId }) => {
             Join thousands of home chefs who are discovering amazing recipes every day
           </p>
           
-          {customerId ? (
+          {userId ? (
             <div className="cta-buttons">
               <a href="/chatbot" className="cta-button large">
                 <span className="cta-icon">💬</span>
                 Chat with AI Now
+              </a>
+              <a href={`/profile?customerId=${userId}`} className="cta-button large secondary">
+                <span className="cta-icon">👤</span>
+                View My Profile
               </a>
               <a href="/buy-credits" className="cta-button large secondary">
                 <span className="cta-icon">💰</span>

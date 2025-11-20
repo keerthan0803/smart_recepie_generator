@@ -50,10 +50,23 @@ function App() {
               
               {customerName ? (
                 <div className="user-menu">
-                  <span className="user-greeting">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const id = customerId || localStorage.getItem('customerId');
+                      if (id) {
+                        window.location.href = `/profile?customerId=${id}`;
+                      } else {
+                        alert('Please sign in first');
+                        window.location.href = '/signin';
+                      }
+                    }}
+                    className="user-profile-btn"
+                    style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                  >
                     <span className="user-icon">👨‍🍳</span>
                     {customerName}
-                  </span>
+                  </button>
                   <span className="credits-badge" title="Available credits">💰 {credits}</span>
                   <button onClick={handleLogout} className="logout-btn">
                     Logout

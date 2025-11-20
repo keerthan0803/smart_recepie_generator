@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const customerController = require('../controllers/customerController');
+const passport = require('../config/passport');
 
 // Customer registration (Sign Up)
 router.post('/signup', customerController.createCustomer);
@@ -12,8 +13,25 @@ router.post('/login', customerController.loginCustomer);
 router.get('/verify-email', customerController.verifyEmail);
 router.post('/resend-verification', customerController.resendVerificationEmail);
 
+// Forgot Password & Reset Password
+router.post('/forgot-password', customerController.forgotPassword);
+router.post('/reset-password', customerController.resetPassword);
+
+// Google OAuth Routes
+router.get('/auth/google', passport.authenticate('google', { 
+    scope: ['profile', 'email'] 
+}));
+
+router.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/signin' }),
+    customerController.googleAuthCallback
+);
+
 // Get customer profile
 router.get('/:customerId', customerController.getCustomerProfile);
+
+// Check profile completion
+router.get('/:customerId/profile/check', customerController.checkProfileCompletion);
 
 // Update customer profile
 router.put('/:customerId', customerController.updateCustomerProfile);

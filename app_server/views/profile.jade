@@ -1,0 +1,177 @@
+extends layout
+
+block content
+  link(rel="stylesheet", href="/stylesheets/profile.css")
+  
+  .header
+    .logo-icon 🍳
+    .brand-text Smart Recipe Generator
+    .header-actions
+      a(href='/').nav-link Home
+      a(href='/chatbot').nav-link AI Chat
+      button#logoutBtn.logout-btn Logout
+  
+  .profile-container
+    .profile-sidebar
+      .profile-avatar
+        .avatar-circle
+          span#avatarInitials --
+        button#changeAvatarBtn.change-avatar-btn 📷 Change Photo
+      
+      .profile-stats
+        .stat-card
+          .stat-icon 💬
+          .stat-info
+            .stat-value#chatCount 0
+            .stat-label Total Chats
+        
+        .stat-card
+          .stat-icon 🪙
+          .stat-info
+            .stat-value#creditsCount 0
+            .stat-label Credits
+        
+        .stat-card
+          .stat-icon 🍽️
+          .stat-info
+            .stat-value#recipesCount 0
+            .stat-label Saved Recipes
+    
+    .profile-main
+      .profile-header
+        h1 My Profile
+        .header-buttons
+          button#editProfileBtn.btn-secondary Edit Profile
+          a(href='/buy-credits').btn-primary Buy Credits
+      
+      .profile-content
+        #viewMode.view-mode
+          .info-section
+            h2 Personal Information
+            .info-grid
+              .info-item
+                .info-label First Name
+                .info-value#viewFirstName --
+              
+              .info-item
+                .info-label Last Name
+                .info-value#viewLastName --
+              
+              .info-item
+                .info-label Email
+                .info-value#viewEmail --
+              
+              .info-item
+                .info-label Phone Number
+                .info-value#viewPhone Not provided
+              
+              .info-item
+                .info-label Age
+                .info-value#viewAge Not provided
+              
+              .info-item
+                .info-label Skill Level
+                .info-value#viewSkillLevel --
+          
+          .info-section
+            h2 Dietary Preferences
+            .preferences-container
+              .preferences-list#viewDietaryPrefs
+                .empty-state No dietary preferences set
+          
+          .info-section
+            h2 Allergies
+            .preferences-container
+              .preferences-list#viewAllergies
+                .empty-state No allergies specified
+          
+          .info-section
+            h2 Account Information
+            .info-grid
+              .info-item
+                .info-label Account Status
+                .info-value
+                  span.status-badge.active Active
+              
+              .info-item
+                .info-label Member Since
+                .info-value#viewMemberSince --
+              
+              .info-item
+                .info-label Last Login
+                .info-value#viewLastLogin --
+              
+              .info-item
+                .info-label Email Verified
+                .info-value#viewEmailVerified
+                  span.status-badge --
+        
+        #editMode.edit-mode(style="display: none;")
+          form#editProfileForm
+            .info-section
+              h2 Personal Information
+              .form-grid
+                .form-group
+                  label(for="editFirstName") First Name
+                  input(type="text", id="editFirstName", name="firstName", required)
+                
+                .form-group
+                  label(for="editLastName") Last Name
+                  input(type="text", id="editLastName", name="lastName", required)
+                
+                .form-group
+                  label(for="editPhone") Phone Number
+                  input(type="tel", id="editPhone", name="phoneNumber", placeholder="+1 (555) 123-4567")
+                
+                .form-group
+                  label(for="editAge") Age
+                  input(type="number", id="editAge", name="age", min="13", max="120", placeholder="Enter your age")
+                
+                .form-group.full-width
+                  label(for="editSkillLevel") Cooking Skill Level
+                  select(id="editSkillLevel", name="skillLevel")
+                    option(value="beginner") Beginner - Just starting out
+                    option(value="intermediate") Intermediate - Some experience
+                    option(value="advanced") Advanced - Very experienced
+                    option(value="professional") Professional Chef
+            
+            .info-section
+              h2 Dietary Preferences
+              .checkbox-grid
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="vegetarian")
+                  span 🥗 Vegetarian
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="vegan")
+                  span 🌱 Vegan
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="gluten-free")
+                  span 🌾 Gluten-Free
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="dairy-free")
+                  span 🥛 Dairy-Free
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="keto")
+                  span 🥑 Keto
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="paleo")
+                  span 🍖 Paleo
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="halal")
+                  span ☪️ Halal
+                label.checkbox-label
+                  input(type="checkbox", name="dietaryPreferences", value="kosher")
+                  span ✡️ Kosher
+            
+            .info-section
+              h2 Allergies
+              .form-group
+                label(for="editAllergies") Allergies (comma-separated)
+                textarea(id="editAllergies", name="allergies", rows="3", placeholder="e.g., peanuts, shellfish, eggs")
+                .helper-text Enter your allergies separated by commas
+            
+            .form-actions
+              button(type="button")#cancelEditBtn.btn-secondary Cancel
+              button(type="submit").btn-primary Save Changes
+  
+  script(src='/javascripts/profile.js')

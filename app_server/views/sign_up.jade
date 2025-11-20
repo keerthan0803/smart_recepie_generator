@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  link(rel='stylesheet', href='/stylesheets/sign_up.css')
+  link(rel="stylesheet", href="/stylesheets/sign_up.css")
   .header
     .logo-icon 🍳
     .brand-text Smart Recipe Generator
@@ -67,12 +67,9 @@ block content
         span Or sign up with
       
       .social-login
-        button.social-btn(type="button")
+        button.social-btn(type="button", data-provider="google")
           span 📧
           | Google
-        button.social-btn(type="button")
-          span 📘
-          | Facebook
       
       .signin-link
         | Already have an account? 

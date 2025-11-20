@@ -24,7 +24,24 @@ const customerSchema = new mongoose.Schema({
         required: true
     },
     
+    // OAuth Information
+    googleId: {
+        type: String,
+        default: null
+    },
+    
     // Profile Information
+    phoneNumber: {
+        type: String,
+        default: null,
+        trim: true
+    },
+    age: {
+        type: Number,
+        default: null,
+        min: 13,
+        max: 120
+    },
     skillLevel: {
         type: String,
         enum: ['beginner', 'intermediate', 'advanced', 'professional'],
@@ -33,6 +50,10 @@ const customerSchema = new mongoose.Schema({
     profileImage: {
         type: String,
         default: null
+    },
+    profileCompleted: {
+        type: Boolean,
+        default: false
     },
     
     // Preferences
@@ -192,12 +213,58 @@ customerSchema.add({
         type: Date,
         default: null
     },
+    // Password Reset fields
+    passwordResetToken: {
+        type: String,
+        default: null
+    },
+    passwordResetExpires: {
+        type: Date,
+        default: null
+    },
     // Credits / Billing
     credits: {
         type: Number,
         default: 10,
         min: 0
-    }
+    },
+    // Pending Transactions (for payment tracking)
+    pendingTransactions: [{
+        transactionId: {
+            type: String,
+            required: true
+        },
+        credits: {
+            type: Number,
+            required: true
+        },
+        amount: {
+            type: Number,
+            required: true
+        },
+        gateway: {
+            type: String,
+            enum: ['stripe', 'phonepe'],
+            required: true
+        },
+        status: {
+            type: String,
+            enum: ['PENDING', 'COMPLETED', 'FAILED', 'PAYMENT_PENDING', 'PAYMENT_SUCCESS'],
+            default: 'PENDING'
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        },
+        completedAt: {
+            type: Date,
+            default: null
+        },
+        phonePeTransactionId: {
+            type: String,
+            default: null
+        }
+    }]
 });
 
 // Methods for credits

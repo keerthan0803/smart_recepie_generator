@@ -177,9 +177,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Social login handlers
     document.querySelectorAll('.social-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const provider = this.textContent.trim();
-            alert(`${provider} signup coming soon! (This is a demo)`);
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const provider = this.getAttribute('data-provider');
+            if (provider === 'google') {
+                // Redirect to Google OAuth
+                window.location.href = '/api/customer/auth/google';
+            } else {
+                alert(`${provider} signup coming soon!`);
+            }
         });
     });
 });

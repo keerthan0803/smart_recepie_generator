@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  link(rel='stylesheet', href='/stylesheets/sign_in.css')
+  link(rel="stylesheet", href="/stylesheets/sign_in.css")
   
   .header
     .logo-icon 🍳
@@ -40,12 +40,9 @@ block content
         span Or continue with
       
       .social-login
-        button.social-btn(type="button")
+        button.social-btn(type="button", data-provider="google")
           span 📧
           | Google
-        button.social-btn(type="button")
-          span 📘
-          | Facebook
       
       .signup-link
         | New to cooking? 

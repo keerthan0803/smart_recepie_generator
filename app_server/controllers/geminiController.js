@@ -1,8 +1,8 @@
 const axios = require('axios');
 const Customer = require('../models/customer');
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-const ALT_MODELS = (process.env.GEMINI_ALT_MODELS || 'gemini-1.5-pro').split(',').map(s => s.trim()).filter(Boolean);
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const ALT_MODELS = (process.env.GEMINI_ALT_MODELS || 'gemini-pro').split(',').map(s => s.trim()).filter(Boolean);
 
 // Generate AI response using Google Gemini API
 const generateRecipeResponse = async (req, res) => {
@@ -63,7 +63,7 @@ Keep responses concise but informative. Use emojis occasionally to make the conv
         // Helper to call Gemini with retries and alternate models
         const callGemini = async (modelName) => {
             return axios.post(
-                `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+                `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`,
                 {
                     contents: [{ parts: [{ text: conversationText }] }],
                     generationConfig: {
@@ -181,7 +181,7 @@ Please provide:
 Format the response in a clear, easy-to-read structure.`;
 
         const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
             {
                 contents: [{
                     parts: [{

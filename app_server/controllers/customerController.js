@@ -204,6 +204,9 @@ const getCustomerProfile = async (req, res) => {
     try {
         const { customerId } = req.params;
 
+        // Require Recipe model to ensure it's registered
+        require('../models/recipe');
+
         const customer = await Customer.findById(customerId)
             .select('-password')
             .populate('savedRecipes')
@@ -602,6 +605,12 @@ const updateCustomerProfile = async (req, res) => {
         // Don't allow password update through this endpoint
         delete updates.password;
         delete updates.email;
+        delete updates.googleId;
+
+        // Mark profile as completed if key fields are present
+        if (updates.phoneNumber && updates.age !== undefined) {
+            updates.profileCompleted = true;
+        }
 
         const customer = await Customer.findByIdAndUpdate(
             customerId,
@@ -626,6 +635,51 @@ const updateCustomerProfile = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error updating profile',
+            error: error.message
+        });
+    }
+};
+
+// Check if profile is complete
+const checkProfileCompletion = async (req, res) => {
+    try {
+        const { customerId } = req.params;
+
+        const customer = await Customer.findById(customerId).select('-password');
+        
+        if (!customer) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found'
+            });
+        }
+
+        const isComplete = customer.profileCompleted && 
+                          customer.phoneNumber && 
+                          customer.age !== null;
+
+        res.status(200).json({
+            success: true,
+            isComplete,
+            customer: {
+                id: customer._id,
+                firstName: customer.firstName,
+                lastName: customer.lastName,
+                email: customer.email,
+                phoneNumber: customer.phoneNumber,
+                age: customer.age,
+                skillLevel: customer.skillLevel,
+                profileImage: customer.profileImage,
+                dietaryPreferences: customer.dietaryPreferences,
+                allergies: customer.allergies,
+                profileCompleted: customer.profileCompleted
+            }
+        });
+    } catch (error) {
+        console.error('Error checking profile:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error checking profile completion',
             error: error.message
         });
     }
@@ -710,6 +764,252 @@ const resendVerificationEmail = async (req, res) => {
     }
 };
 
+// Google OAuth Callback Handler
+const googleAuthCallback = async (req, res) => {
+    try {
+        // User is authenticated via passport, available in req.user
+        const customer = req.user;
+        
+        // Return success response with redirect information
+        res.send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Sign In Successful</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    }
+                    .container {
+                        background: white;
+                        padding: 40px;
+                        border-radius: 10px;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                        text-align: center;
+                    }
+                    .success-icon {
+                        font-size: 60px;
+                        margin-bottom: 20px;
+                    }
+                    h1 {
+                        color: #2d3748;
+                        margin-bottom: 10px;
+                    }
+                    p {
+                        color: #718096;
+                        margin-bottom: 20px;
+                    }
+                    .loader {
+                        border: 4px solid #f3f3f3;
+                        border-top: 4px solid #667eea;
+                        border-radius: 50%;
+                        width: 40px;
+                        height: 40px;
+                        animation: spin 1s linear infinite;
+                        margin: 20px auto;
+                    }
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="success-icon">✅</div>
+                    <h1>Welcome, ${customer.firstName}!</h1>
+                    <p>You have successfully signed in with Google</p>
+                    <div class="loader"></div>
+                    <p>Redirecting to your dashboard...</p>
+                </div>
+                <script>
+                    // Store customer info in localStorage
+                    localStorage.setItem('customerId', '${customer._id}');
+                    localStorage.setItem('customerName', '${customer.firstName}');
+                    localStorage.setItem('customerEmail', '${customer.email}');
+                    localStorage.setItem('customerCredits', '${customer.credits || 0}');
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                </script>
+            </body>
+            </html>
+        `);
+    } catch (error) {
+        console.error('Google auth callback error:', error);
+        res.redirect('/signin?error=auth_failed');
+    }
+};
+
+// Forgot Password - Send reset email
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required'
+            });
+        }
+
+        const customer = await Customer.findByEmail(email);
+        
+        if (!customer) {
+            // Don't reveal if email exists or not for security
+            return res.status(200).json({
+                success: true,
+                message: 'If an account exists with this email, a password reset link has been sent.'
+            });
+        }
+
+        // Check if user signed up with Google
+        if (customer.googleId && !customer.password.startsWith('OAUTH_USER_')) {
+            return res.status(400).json({
+                success: false,
+                message: 'This account uses Google Sign-In. Please sign in with Google instead.'
+            });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        customer.passwordResetToken = resetToken;
+        customer.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+        await customer.save();
+
+        // Send reset email
+        const resetLink = `${APP_BASE_URL}/reset-password?token=${resetToken}&email=${encodeURIComponent(customer.email)}`;
+        
+        try {
+            await sendMail({
+                to: customer.email,
+                subject: 'Password Reset - Smart Recipe Generator',
+                html: `
+                    <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:auto;line-height:1.6;">
+                        <h2>Password Reset Request 🔐</h2>
+                        <p>Hello ${customer.firstName},</p>
+                        <p>We received a request to reset your password. Click the button below to create a new password:</p>
+                        <p>
+                            <a href="${resetLink}" style="display:inline-block;background:#667eea;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;">Reset Password</a>
+                        </p>
+                        <p>Or copy and paste this link into your browser:</p>
+                        <p><a href="${resetLink}">${resetLink}</a></p>
+                        <p style="color:#6b7280;font-size:12px;">This link expires in 1 hour.</p>
+                        <p style="color:#e53e3e;font-size:12px;">If you didn't request this, please ignore this email and your password will remain unchanged.</p>
+                    </div>
+                `
+            });
+        } catch (mailErr) {
+            console.error('Failed to send reset email:', mailErr.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Error sending reset email. Please try again later.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'If an account exists with this email, a password reset link has been sent.'
+        });
+
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error processing password reset request',
+            error: error.message
+        });
+    }
+};
+
+// Reset Password - Update password with token
+const resetPassword = async (req, res) => {
+    try {
+        const { token, email, newPassword } = req.body;
+
+        if (!token || !email || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
+        }
+
+        // Validate password
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 8 characters long'
+            });
+        }
+
+        // Find customer with valid reset token
+        const customer = await Customer.findOne({
+            email: email.toLowerCase(),
+            passwordResetToken: token,
+            passwordResetExpires: { $gt: new Date() }
+        });
+
+        if (!customer) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired reset token'
+            });
+        }
+
+        // Hash new password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Update password and clear reset token
+        customer.password = hashedPassword;
+        customer.passwordResetToken = null;
+        customer.passwordResetExpires = null;
+        await customer.save();
+
+        // Send confirmation email
+        try {
+            await sendMail({
+                to: customer.email,
+                subject: 'Password Changed Successfully - Smart Recipe Generator',
+                html: `
+                    <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:auto;line-height:1.6;">
+                        <h2>Password Changed ✅</h2>
+                        <p>Hello ${customer.firstName},</p>
+                        <p>Your password has been successfully changed.</p>
+                        <p>If you didn't make this change, please contact us immediately.</p>
+                        <p>
+                            <a href="${APP_BASE_URL}/signin" style="display:inline-block;background:#16a34a;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;">Sign In Now</a>
+                        </p>
+                    </div>
+                `
+            });
+        } catch (mailErr) {
+            console.error('Failed to send confirmation email:', mailErr.message);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Password reset successfully. You can now sign in with your new password.'
+        });
+
+    } catch (error) {
+        console.error('Reset password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error resetting password',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createCustomer,
     loginCustomer,
@@ -725,5 +1025,9 @@ module.exports = {
     getChatHistory,
     updateCustomerProfile,
     verifyEmail,
-    resendVerificationEmail
+    resendVerificationEmail,
+    googleAuthCallback,
+    forgotPassword,
+    resetPassword,
+    checkProfileCompletion
 };

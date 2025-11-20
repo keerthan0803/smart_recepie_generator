@@ -178,18 +178,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Social login handlers
     document.querySelectorAll('.social-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const provider = this.textContent.trim();
-            alert(`${provider} sign in coming soon! (This is a demo)`);
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const provider = this.getAttribute('data-provider');
+            if (provider === 'google') {
+                // Redirect to Google OAuth
+                window.location.href = '/api/customer/auth/google';
+            } else {
+                alert(`${provider} sign in coming soon!`);
+            }
         });
     });
 
     // Forgot password handler
     const forgotPasswordLink = document.querySelector('.forgot-password');
     if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener('click', function(e) {
+        forgotPasswordLink.addEventListener('click', async function(e) {
             e.preventDefault();
-            alert('Forgot password feature coming soon! 🔐');
+            
+            const email = prompt('Enter your email address to receive a password reset link:');
+            
+            if (!email) return;
+            
+            if (!validateEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/customer/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    alert('✅ ' + result.message + '\n\nPlease check your email inbox and spam folder.');
+                } else {
+                    alert('❌ ' + (result.message || 'Error sending reset email. Please try again.'));
+                }
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                alert('Error sending reset email. Please check your connection and try again.');
+            }
         });
     }
 });
