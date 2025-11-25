@@ -81,7 +81,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://smart-recepie-generator-1nwr.onrender.com',
   process.env.BASE_URL
-].filter(Boolean);
+].filter(url => url && url.trim() !== '');
 
 app.use(cors({
   origin: function(origin, callback) {
